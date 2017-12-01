@@ -24,11 +24,4 @@ unsigned verticesPrepare(float *vertices, unsigned size);
 unsigned elementsPrepare(unsigned *indices, unsigned size);
 unsigned getVao(unsigned vaoNo);
 
-unsigned getShaderProgram(unsigned shaderNo);
-unsigned vertexShaderPrepare();
-void checkShaderCompilation(unsigned shader, const char *shaderType);
-unsigned fragmentShaderPrepare(unsigned shaderNo);
-unsigned shaderProgramPrepare(unsigned vertexShader, unsigned fragmentShader);
-void checkShaderProgramCompilation(unsigned shaderProgram);
-
 #endif // MAIN_H

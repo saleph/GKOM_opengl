@@ -39,8 +39,6 @@ int main()
 
 	Shader shader1("vertexShader1.vert", "fragmentShader1.frag");
 	Shader shader2("vertexShader1.vert", "fragmentShader2.frag");
-	//unsigned shaderProgram1 = getShaderProgram(1);
-	//unsigned shaderProgram2 = getShaderProgram(2);
 
 	std::async(std::launch::async, currentFpsShow, window);
 
@@ -168,90 +166,4 @@ unsigned elementsPrepare(unsigned *indices, unsigned size) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
 	return EBO;
-}
-
-unsigned getShaderProgram(unsigned shaderNo) {
-	unsigned vertexShader = vertexShaderPrepare();
-	unsigned fragmentShader = fragmentShaderPrepare(shaderNo);
-	unsigned shaderProgram = shaderProgramPrepare(vertexShader, fragmentShader);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	return shaderProgram;
-}
-
-unsigned vertexShaderPrepare() {
-	const char *vertexShaderSource =
-		"#version 330 core\n"
-		"layout(location = 0) in vec3 aPos;\n"
-		"layout(location = 1) in vec3 aColor;"
-		"out vec3 vertColor;\n"
-		"void main(){\n"
-		"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"	vertColor = aColor;\n"
-		"}\n";
-	unsigned vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	checkShaderCompilation(vertexShader, "VERTEX");
-	return vertexShader;
-}
-
-void checkShaderCompilation(unsigned shader, const char *shaderType) {
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-		glfwTerminate();
-		exit(-1);
-	}
-}
-
-unsigned fragmentShaderPrepare(unsigned shaderNo) {
-	const char *fragmentShaderSource1 =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"in vec3 vertColor;\n"
-		"void main() {\n"
-		"	FragColor = vec4(vertColor, 1.0); \n"
-		"}\n";
-	const char *fragmentShaderSource2 =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"uniform vec4 ourColor;\n"
-		"void main() {\n"
-		"	FragColor = ourColor; \n"
-		"}\n";
-	unsigned fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, 
-		shaderNo == 1 ? &fragmentShaderSource1 : &fragmentShaderSource2,
-		NULL);
-	glCompileShader(fragmentShader);
-	checkShaderCompilation(fragmentShader, "FRAGMENT");
-	return fragmentShader;
-}
-
-unsigned shaderProgramPrepare(unsigned vertexShader, unsigned fragmentShader) {
-	unsigned shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	checkShaderProgramCompilation(shaderProgram);
-	return shaderProgram;
-}
-
-void checkShaderProgramCompilation(unsigned shaderProgram) {
-	int  success;
-	char infoLog[512];
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::LINK_FAILED\n" << infoLog << std::endl;
-		glfwTerminate();
-		exit(-1);
-	}
 }
