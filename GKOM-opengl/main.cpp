@@ -3,6 +3,27 @@
 std::atomic<unsigned long long> fps;
 
 
+float vertices1[] = {
+	// first triangle
+	-0.5f, 0.5f, 0.0f,  // top  
+	-0.8f, -0.2f, 0.0f,  // bottom left
+	-0.2f, -0.2f, 0.0f,  // bottom right
+};
+
+float vertices2[] = {
+	0.5f, 0.5f, 0.0f,  // top  
+	0.2f, -0.2f, 0.0f,  // bottom left
+	0.8f, -0.2f, 0.0f,  // bottom right 
+};
+
+unsigned indices1[] = {  // note that we start from 0!
+	0, 1, 2,   // first triangle
+};
+
+unsigned indices2[] = {  // note that we start from 0!
+	0, 1, 2,   // first triangle
+};
+
 int main()
 {
 	initOpengl();
@@ -13,8 +34,10 @@ int main()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	unsigned VAO = getVao();
-	unsigned shaderProgram = getShaderProgram();
+	unsigned VAO1 = getVao(1);
+	unsigned VAO2 = getVao(2);
+	unsigned shaderProgram1 = getShaderProgram(1);
+	unsigned shaderProgram2 = getShaderProgram(2);
 	std::async(std::launch::async, currentFpsShow, window);
 
 	// RENDER LOOP
@@ -24,7 +47,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		render(shaderProgram, VAO);
+		render(shaderProgram1, VAO1);
+		render(shaderProgram2, VAO2);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -86,58 +110,49 @@ void currentFpsShow(GLFWwindow* window) {
 void render(unsigned shaderProgram, unsigned VAO) {
 	glUseProgram(shaderProgram);
 	glBindVertexArray(VAO);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
 	glBindVertexArray(0);
 }
 
-unsigned getVao() {
+unsigned getVao(unsigned vaoNo) {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	// 1. bind Vertex Array Object
 	glBindVertexArray(VAO);
 	// 2. copy our vertices array in a buffer for OpenGL to use
-	unsigned VBO = verticesPrepare();
-	unsigned EBO = elementsPrepare();
+
+	// same for 1 and 2
+	unsigned vertSize = sizeof(vertices1);
+	unsigned elementsSize = sizeof(indices1);
+
+	unsigned VBO = verticesPrepare(vaoNo == 1 ? vertices1 : vertices2, vertSize);
+	unsigned EBO = elementsPrepare(vaoNo == 1 ? indices1 : indices1, elementsSize);
 	// 3. then set our vertex attributes pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	return VAO;
 }
 
-unsigned verticesPrepare() {
-	float vertices[] = {
-		// first triangle
-		-0.5f, 0.5f, 0.0f,  // top  
-		-0.8f, -0.2f, 0.0f,  // bottom left
-		-0.2f, -0.2f, 0.0f,  // bottom right 
-		// second triangle
-		0.5f, 0.5f, 0.0f,  // top  
-		0.2f, -0.2f, 0.0f,  // bottom left
-		0.8f, -0.2f, 0.0f,  // bottom right 
-	};
+unsigned verticesPrepare(float *vertices, unsigned size) {
 	unsigned VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 	return VBO;
 }
 
-unsigned elementsPrepare() {
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
+unsigned elementsPrepare(unsigned *indices, unsigned size) {
 	unsigned EBO;
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
 	return EBO;
 }
 
-unsigned getShaderProgram() {
+unsigned getShaderProgram(unsigned shaderNo) {
 	unsigned vertexShader = vertexShaderPrepare();
-	unsigned fragmentShader = fragmentShaderPrepare();
+	unsigned fragmentShader = fragmentShaderPrepare(shaderNo);
 	unsigned shaderProgram = shaderProgramPrepare(vertexShader, fragmentShader);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
@@ -171,16 +186,24 @@ void checkShaderCompilation(unsigned shader, const char *shaderType) {
 	}
 }
 
-unsigned fragmentShaderPrepare() {
-	const char *fragmentShaderSource =
+unsigned fragmentShaderPrepare(unsigned shaderNo) {
+	const char *fragmentShaderSource1 =
 		"#version 330 core\n"
 		"out vec4 FragColor;\n"
 		"void main() {\n"
 		"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f); \n"
 		"}\n";
+	const char *fragmentShaderSource2 =
+		"#version 330 core\n"
+		"out vec4 FragColor;\n"
+		"void main() {\n"
+		"	FragColor = vec4(0.2f, 0.5f, 0.9f, 1.0f); \n"
+		"}\n";
 	unsigned fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glShaderSource(fragmentShader, 1, 
+		shaderNo == 1 ? &fragmentShaderSource1 : &fragmentShaderSource2,
+		NULL);
 	glCompileShader(fragmentShader);
 	checkShaderCompilation(fragmentShader, "FRAGMENT");
 	return fragmentShader;
