@@ -38,6 +38,7 @@ int main()
 	unsigned VAO2 = getVao(2);
 	unsigned shaderProgram1 = getShaderProgram(1);
 	unsigned shaderProgram2 = getShaderProgram(2);
+
 	std::async(std::launch::async, currentFpsShow, window);
 
 	// RENDER LOOP
@@ -63,6 +64,7 @@ void initOpengl() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	std::cout << ">> OpenGL initialized" << std::endl;
 }
 
 GLFWwindow *createWindow() {
@@ -76,6 +78,7 @@ GLFWwindow *createWindow() {
 	// set resize callback
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	std::cout << ">> Window created" << std::endl;
 
 	return window;
 }
@@ -92,6 +95,7 @@ void initGlad() {
 		glfwTerminate();
 		exit(-1);
 	}
+	std::cout << ">> GLAD initialized" << std::endl;
 }
 
 void processInput(GLFWwindow *window) {
