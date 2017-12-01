@@ -5,24 +5,26 @@ std::atomic<double> frameTimes;
 
 
 float vertices1[] = {
-	// positions         // colors
-	-0.5f, 0.5f, 0.0f,	1.0f, 0.0f, 0.0f,   
-	-0.8f, -0.2f, 0.0f, 0.0f, 1.0f, 0.0f,  
-	-0.2f, -0.2f, 0.0f,	0.0f, 0.0f, 1.0f   
-};
-
-float vertices2[] = {
-	0.5f, 0.5f, 0.0f,  // top  
-	0.2f, -0.2f, 0.0f,  // bottom left
-	0.8f, -0.2f, 0.0f,  // bottom right 
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 };
 
 unsigned indices1[] = {  // note that we start from 0!
-	0, 1, 2,   // first triangle
+	0, 1, 3,   // first triangle
+	1, 2, 3    // second triangle
+};
+
+float vertices2[] = {
+	0.0f, 0.3f, 0.0f,  // top  
+	-0.3f, 0.0f, 0.0f,  // bottom left
+	0.3f, 0.0f, 0.0f  // bottom right 
 };
 
 unsigned indices2[] = {  // note that we start from 0!
-	0, 1, 2,   // first triangle
+	0, 1, 2   // first triangle
 };
 
 int main()
@@ -37,9 +39,10 @@ int main()
 
 	unsigned VAO1 = getVao(1);
 	unsigned VAO2 = getVao(2);
+	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
 
 	Shader shader1("vertexShader1.vert", "fragmentShader1.frag");
-	Shader shader2("vertexShader1.vert", "fragmentShader2.frag");
+	Shader shader2("vertexShader2.vert", "fragmentShader2.frag");
 
 	std::async(std::launch::async, currentFpsShow, window);
 
@@ -51,10 +54,10 @@ int main()
 
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render(shader1, VAO1);
-		render(shader2, VAO2);
+		render(shader1, VAO1, texture);
+		render(shader2, VAO2, -1);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -119,16 +122,23 @@ void currentFpsShow(GLFWwindow* window) {
 	}
 }
 
-void render(const Shader &shaderProgram, unsigned VAO) {
+void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
-	shaderProgram.setFloatUniform("ourColor", greenValue);
+	shaderProgram.setFloatUniform("uniColor", greenValue);
 	shaderProgram.use();
 
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	if (texture != -1) {
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
+	else {
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
 	glBindVertexArray(0);
 }
 
@@ -141,19 +151,21 @@ unsigned getVao(unsigned vaoNo) {
 
 	// same for 1 and 2
 	unsigned vertSize = vaoNo == 1 ? sizeof(vertices1) : sizeof(vertices2);
-	unsigned elementsSize = sizeof(indices2);
+	unsigned elementsSize = vaoNo == 1 ? sizeof(indices1) : sizeof(indices2);
 
 	unsigned VBO = verticesPrepare(vaoNo == 1 ? vertices1 : vertices2, vertSize);
-	unsigned EBO = elementsPrepare(vaoNo == 1 ? indices1 : indices1, elementsSize);
+	unsigned EBO = elementsPrepare(vaoNo == 1 ? indices1 : indices2, elementsSize);
 	// 3. then set our vertex attributes pointers
-	if (vaoNo == 2) {
+	if (vaoNo == 1) {
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+	} else {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-	} else {
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
 	}
 
 	return VAO;
@@ -173,4 +185,28 @@ unsigned elementsPrepare(unsigned *indices, unsigned size) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
 	return EBO;
+}
+
+unsigned loadMinmapTexture(const char* fname) {
+	int width, height;
+	unsigned char* image = SOIL_load_image(fname, &width, &height, 0, SOIL_LOAD_RGB);
+	if (image == nullptr) {
+		std::cout << "ERROR::TEXTURE::CAN'T_LOAD: " << fname << std::endl;
+		exit(-1);
+	}
+
+	unsigned texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return texture;
 }

@@ -2,6 +2,7 @@
 #define MAIN_H
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <SOIL.h>
 #include <thread>
 #include <chrono>
 #include <vector>
@@ -22,10 +23,12 @@ void initGlad();
 void processInput(GLFWwindow *window);
 void currentFpsShow(GLFWwindow* window);
 
-void render(const Shader &shaderProgram, unsigned VAO);
+void render(const Shader &shaderProgram, unsigned VAO, int texture);
 unsigned verticesPrepare(float *vertices, unsigned size);
 unsigned elementsPrepare(unsigned *indices, unsigned size);
 unsigned getVao(unsigned vaoNo);
+
+unsigned loadMinmapTexture(const char* fname);
 
 class Timer
 {

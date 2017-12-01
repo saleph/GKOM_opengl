@@ -37,5 +37,6 @@
     <None Include="fragmentShader1.frag" />
     <None Include="vertexShader1.vert" />
     <None Include="fragmentShader2.frag" />
+    <None Include="vertexShader2.vert" />
   </ItemGroup>
 </Project>
