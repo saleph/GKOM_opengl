@@ -1,18 +1,30 @@
 #include "main.h"
 
+std::atomic<unsigned long long> fps;
+
+
 int main()
 {
 	initOpengl();
 	GLFWwindow* window = createWindow();
 	initGlad();
 
+	// line/fill setting
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+	unsigned VAO = getVao();
+	unsigned shaderProgram = getShaderProgram();
+	std::async(std::launch::async, currentFpsShow, window);
+
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) {
+		++fps;
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		render();
+		render(shaderProgram, VAO);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -63,37 +75,65 @@ void processInput(GLFWwindow *window) {
 		glfwSetWindowShouldClose(window, true);
 }
 
-void render() {
-	unsigned VBO = verticesPrepare();
-	//unsigned VAO = attributesPrepare();
-	unsigned shaderProgram = uploadShaderOnGpu();
+void currentFpsShow(GLFWwindow* window) {
+	while (!glfwWindowShouldClose(window)) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::cout << "FPS: " << fps << std::endl;
+		fps = 0;
+	}
+}
 
+void render(unsigned shaderProgram, unsigned VAO) {
+	glUseProgram(shaderProgram);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+unsigned getVao() {
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	// 1. bind Vertex Array Object
+	glBindVertexArray(VAO);
+	// 2. copy our vertices array in a buffer for OpenGL to use
+	unsigned VBO = verticesPrepare();
+	unsigned EBO = elementsPrepare();
+	// 3. then set our vertex attributes pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	return VAO;
 }
 
 unsigned verticesPrepare() {
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
+		0.5f, 0.5f, 0.0f,  // top right
+		0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f, 0.5f, 0.0f   // top left 
 	};
 	unsigned VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
 	return VBO;
 }
 
-unsigned attributesPrepare() {
-	return 0;
+unsigned elementsPrepare() {
+	unsigned int indices[] = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
+	unsigned EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	return EBO;
 }
 
-unsigned uploadShaderOnGpu() {
+unsigned getShaderProgram() {
 	unsigned vertexShader = vertexShaderPrepare();
 	unsigned fragmentShader = fragmentShaderPrepare();
 	unsigned shaderProgram = shaderProgramPrepare(vertexShader, fragmentShader);
-	glUseProgram(shaderProgram);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	return shaderProgram;
