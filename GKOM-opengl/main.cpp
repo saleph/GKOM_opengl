@@ -10,8 +10,8 @@ int main()
 	initGlad();
 
 	// line/fill setting
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	unsigned VAO = getVao();
 	unsigned shaderProgram = getShaderProgram();
@@ -86,7 +86,8 @@ void currentFpsShow(GLFWwindow* window) {
 void render(unsigned shaderProgram, unsigned VAO) {
 	glUseProgram(shaderProgram);
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 }
 
@@ -106,10 +107,14 @@ unsigned getVao() {
 
 unsigned verticesPrepare() {
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f, 0.5f, 0.0f   // top left 
+		// first triangle
+		-0.5f, 0.5f, 0.0f,  // top  
+		-0.8f, -0.2f, 0.0f,  // bottom left
+		-0.2f, -0.2f, 0.0f,  // bottom right 
+		// second triangle
+		0.5f, 0.5f, 0.0f,  // top  
+		0.2f, -0.2f, 0.0f,  // bottom left
+		0.8f, -0.2f, 0.0f,  // bottom right 
 	};
 	unsigned VBO;
 	glGenBuffers(1, &VBO);
