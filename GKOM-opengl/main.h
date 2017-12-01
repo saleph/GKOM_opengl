@@ -10,6 +10,7 @@
 #include <future>
 #include <atomic>
 #include <iostream>
+#include "Shader.h"
 
 void initOpengl();
 GLFWwindow *createWindow();
@@ -18,7 +19,7 @@ void initGlad();
 void processInput(GLFWwindow *window);
 void currentFpsShow(GLFWwindow* window);
 
-void render(unsigned shaderProgram, unsigned VAO);
+void render(const Shader &shaderProgram, unsigned VAO);
 unsigned verticesPrepare(float *vertices, unsigned size);
 unsigned elementsPrepare(unsigned *indices, unsigned size);
 unsigned getVao(unsigned vaoNo);

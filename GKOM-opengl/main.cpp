@@ -36,8 +36,11 @@ int main()
 
 	unsigned VAO1 = getVao(1);
 	unsigned VAO2 = getVao(2);
-	unsigned shaderProgram1 = getShaderProgram(1);
-	unsigned shaderProgram2 = getShaderProgram(2);
+
+	Shader shader1("vertexShader1.vert", "fragmentShader1.frag");
+	Shader shader2("vertexShader1.vert", "fragmentShader2.frag");
+	//unsigned shaderProgram1 = getShaderProgram(1);
+	//unsigned shaderProgram2 = getShaderProgram(2);
 
 	std::async(std::launch::async, currentFpsShow, window);
 
@@ -48,8 +51,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		render(shaderProgram1, VAO1);
-		render(shaderProgram2, VAO2);
+		render(shader1, VAO1);
+		render(shader2, VAO2);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -111,13 +114,12 @@ void currentFpsShow(GLFWwindow* window) {
 	}
 }
 
-void render(unsigned shaderProgram, unsigned VAO) {
+void render(const Shader &shaderProgram, unsigned VAO) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-	int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-	glUseProgram(shaderProgram);
-	glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
+	shaderProgram.setFloatUniform("ourColor", greenValue);
+	shaderProgram.use();
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);

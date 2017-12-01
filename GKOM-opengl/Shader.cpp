@@ -10,6 +10,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	const char* fShaderCode = fragmentCode.c_str();
 
 	shaderProgramId = getShaderProgram(vShaderCode, fShaderCode);
+	std::cout << ">> Shader loaded: " << vertexPath << "; " << fragmentPath << std::endl;
 }
 
 std::string Shader::getVertexShaderSource(const char* vertexPath) {
@@ -37,7 +38,7 @@ std::string Shader::getVertexShaderSource(const char* vertexPath) {
 }
 
 std::string Shader::getFragmentShaderSource(const char* fragmentPath) {
-	std::string fragmentCode = getFragmentShaderSource(fragmentPath);
+	std::string fragmentCode;
 	std::ifstream fShaderFile;
 
 	// ensure ifstream objects can throw exceptions:
@@ -121,18 +122,21 @@ void Shader::checkShaderProgramCompilation(unsigned shaderProgram) {
 	}
 }
 
-void Shader::use() {
+void Shader::use() const {
 	glUseProgram(shaderProgramId);
 }
 
-void Shader::setBool(const std::string &name, bool value) const {
+void Shader::setBoolUniform(const std::string &name, bool value) const {
+	use();
 	glUniform1i(glGetUniformLocation(shaderProgramId, name.c_str()), (int)value);
 }
 
-void Shader::setInt(const std::string &name, int value) const {
+void Shader::setIntUniform(const std::string &name, int value) const {
+	use();
 	glUniform1i(glGetUniformLocation(shaderProgramId, name.c_str()), value);
 }
 
-void Shader::setFloat(const std::string &name, float value) const {
+void Shader::setFloatUniform(const std::string &name, float value) const {
+	use();
 	glUniform1f(glGetUniformLocation(shaderProgramId, name.c_str()), value);
 }

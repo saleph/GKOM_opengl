@@ -88,6 +88,11 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="fragmentShader1.frag" />
+    <None Include="fragmentShader2.frag" />
+    <None Include="vertexShader1.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
