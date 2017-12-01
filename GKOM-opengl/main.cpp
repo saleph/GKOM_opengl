@@ -130,6 +130,7 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	shaderProgram.use();
 
 	if (texture != -1) {
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
