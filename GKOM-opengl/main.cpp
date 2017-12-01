@@ -1,6 +1,7 @@
 #include "main.h"
 
 std::atomic<unsigned long long> fps;
+std::atomic<double> frameTimes;
 
 
 float vertices1[] = {
@@ -44,7 +45,10 @@ int main()
 
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) {
-		++fps;
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+		Timer t;
+
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -54,6 +58,8 @@ int main()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		++fps;
+		frameTimes = frameTimes + t.elapsed();
 	}
 
 	glfwTerminate();
@@ -107,8 +113,9 @@ void processInput(GLFWwindow *window) {
 void currentFpsShow(GLFWwindow* window) {
 	while (!glfwWindowShouldClose(window)) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		std::cout << "FPS: " << fps << std::endl;
+		std::cout << "FPS: " << fps << "\t Frame time: " << std::setprecision(2) << frameTimes * 1000.0 / fps << " ms" << std::endl;
 		fps = 0;
+		frameTimes = 0;
 	}
 }
 
