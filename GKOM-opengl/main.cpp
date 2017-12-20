@@ -36,7 +36,7 @@ int main()
 	// line/fill setting
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+	glEnable(GL_DEPTH_TEST);
 	unsigned VAO1 = getVao(1);
 	unsigned VAO2 = getVao(2);
 	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
@@ -77,6 +77,8 @@ void initOpengl() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+
 	std::cout << ">> OpenGL initialized" << std::endl;
 }
 
@@ -133,6 +135,20 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	trans = glm::rotate(trans, glm::radians(greenValue*360), glm::vec3(0.0, 0.0, 1.0));
 	trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
 
+	glm::mat4 model;
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 view;
+	// note that we’re translating the scene in the reverse direction of where we want to move
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 projection;
+	float screenWidth = 800.0;
+	float screenHeight = 600.0;
+	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+
+	shaderProgram.setMat4Uniform("model", model);
+	shaderProgram.setMat4Uniform("view", view);
+	shaderProgram.setMat4Uniform("projection", projection);
 	shaderProgram.setMat4Uniform("transform", trans);
 	shaderProgram.setFloatUniform("uniColor", greenValue);
 	shaderProgram.use();
@@ -141,7 +157,7 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 	else {
 		glBindVertexArray(VAO);
