@@ -1,6 +1,6 @@
 #include "main.h"
 
-std::atomic<unsigned long long> fps;
+std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 
 
@@ -31,7 +31,7 @@ int main()
 {
 	initOpengl();
 	GLFWwindow* window = createWindow();
-	initGlad();
+	loadLibraries();
 
 	// line/fill setting
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -70,7 +70,10 @@ int main()
 }
 
 void initOpengl() {
-	glfwInit();
+	if (glfwInit() != GL_TRUE) {
+		std::cout << "GLFW initialization failed" << std::endl;
+		exit(-1);
+	}
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -98,7 +101,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void initGlad() {
+void loadLibraries() {
 	// init glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -126,6 +129,11 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
+	glm::mat4 trans;
+	trans = glm::rotate(trans, glm::radians(greenValue*360), glm::vec3(0.0, 0.0, 1.0));
+	trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
+
+	shaderProgram.setMat4Uniform("transform", trans);
 	shaderProgram.setFloatUniform("uniColor", greenValue);
 	shaderProgram.use();
 

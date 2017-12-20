@@ -128,15 +128,24 @@ void Shader::use() const {
 
 void Shader::setBoolUniform(const std::string &name, bool value) const {
 	use();
-	glUniform1i(glGetUniformLocation(shaderProgramId, name.c_str()), (int)value);
+	unsigned transformLoc = glGetUniformLocation(shaderProgramId, name.c_str());
+	glUniform1i(transformLoc, (int)value);
 }
 
 void Shader::setIntUniform(const std::string &name, int value) const {
 	use();
-	glUniform1i(glGetUniformLocation(shaderProgramId, name.c_str()), value);
+	unsigned transformLoc = glGetUniformLocation(shaderProgramId, name.c_str());
+	glUniform1i(transformLoc, value);
 }
 
 void Shader::setFloatUniform(const std::string &name, float value) const {
 	use();
-	glUniform1f(glGetUniformLocation(shaderProgramId, name.c_str()), value);
+	unsigned transformLoc = glGetUniformLocation(shaderProgramId, name.c_str());
+	glUniform1f(transformLoc, value);
+}
+
+void Shader::setMat4Uniform(const std::string &name, glm::mat4 &value) const {
+	use();
+	unsigned transformLoc = glGetUniformLocation(shaderProgramId, name.c_str());
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(value));
 }

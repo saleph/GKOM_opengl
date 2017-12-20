@@ -1,7 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SOIL.h>
 #include <thread>
 #include <chrono>
@@ -19,7 +23,7 @@
 void initOpengl();
 GLFWwindow *createWindow();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void initGlad();
+void loadLibraries();
 void processInput(GLFWwindow *window);
 void currentFpsShow(GLFWwindow* window);
 
