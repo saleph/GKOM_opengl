@@ -95,9 +95,8 @@ int main()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
-	unsigned VAO1 = getVao(1);
 	unsigned VAO2 = getVao(2);
-	unsigned VAO3 = getVao(3);
+	unsigned VAO1 = getVao(3); // cubes
 	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
 
 	Shader shader1("vertexShader1.vert", "fragmentShader1.frag");
@@ -115,7 +114,7 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render(shader1, VAO3, texture);
+		render(1, shader1, VAO1, texture);
 		//render(shader2, VAO2, -1);
 
 		glfwSwapBuffers(window);
@@ -186,7 +185,7 @@ void currentFpsShow(GLFWwindow* window) {
 	}
 }
 
-void render(const Shader &shaderProgram, unsigned VAO, int texture) {
+void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
@@ -196,10 +195,6 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 
 	glm::mat4 model;
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	//glm::mat4 view;
-	// note that we’re translating the scene in the reverse direction of where we want to move
-	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-	//view = glm::rotate(view, glm::radians(60 * timeValue), glm::vec3(0.0f, 0.0f, -3.0f));
 	float radius = 10.0f;
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
@@ -220,7 +215,7 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	shaderProgram.setFloatUniform("uniColor", greenValue);
 	shaderProgram.use();
 
-	if (texture != -1) {
+	if (vaoType == 1) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
@@ -244,15 +239,10 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-//		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 	else {
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 	glBindVertexArray(0);
 }

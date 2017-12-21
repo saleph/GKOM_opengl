@@ -27,7 +27,7 @@ void loadLibraries();
 void processInput(GLFWwindow *window);
 void currentFpsShow(GLFWwindow* window);
 
-void render(const Shader &shaderProgram, unsigned VAO, int texture);
+void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture);
 unsigned verticesPrepare(float *vertices, unsigned size);
 unsigned elementsPrepare(unsigned *indices, unsigned size);
 unsigned getVao(unsigned vaoNo);
