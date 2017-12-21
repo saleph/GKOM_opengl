@@ -196,16 +196,22 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 
 	glm::mat4 model;
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 view;
+	//glm::mat4 view;
 	// note that we’re translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	//view = glm::rotate(view, glm::radians(60 * timeValue), glm::vec3(0.0f, 0.0f, -3.0f));
+	float radius = 10.0f;
+	float camX = sin(glfwGetTime()) * radius;
+	float camZ = cos(glfwGetTime()) * radius;
+	glm::mat4 view;
+	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3
+		(0.0, 1.0, 0.0));
 
 
 	glm::mat4 projection;
 	float screenWidth = 800.0;
 	float screenHeight = 600.0;
-	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
