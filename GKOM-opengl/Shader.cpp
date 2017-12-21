@@ -87,6 +87,8 @@ void Shader::checkShaderCompilation(unsigned shader, const char *shaderType) {
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
 		glfwTerminate();
+		char x;
+		std::cin >> x;
 		exit(-1);
 	}
 }
@@ -118,6 +120,8 @@ void Shader::checkShaderProgramCompilation(unsigned shaderProgram) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::LINK_FAILED\n" << infoLog << std::endl;
 		glfwTerminate();
+		char x;
+		std::cin >> x;
 		exit(-1);
 	}
 }

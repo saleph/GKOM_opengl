@@ -4,6 +4,64 @@ std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 
 
+
+float verticesCube[] = {
+	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+	0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+	0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+	0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+	0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+	-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+
+	-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+	-0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+	-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+	0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+	0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+	0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+	0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+	-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f
+};
+
+glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f, 0.0f, 0.0f),
+	glm::vec3(2.0f, 5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f, 3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f, 2.0f, -2.5f),
+	glm::vec3(1.5f, 0.2f, -1.5f),
+	glm::vec3(-1.3f, 1.0f, -1.5f)
+};
+
 float vertices1[] = {
     // positions          // colors           // texture coords
      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
@@ -39,6 +97,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	unsigned VAO1 = getVao(1);
 	unsigned VAO2 = getVao(2);
+	unsigned VAO3 = getVao(3);
 	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
 
 	Shader shader1("vertexShader1.vert", "fragmentShader1.frag");
@@ -56,8 +115,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render(shader1, VAO1, texture);
-		render(shader2, VAO2, -1);
+		render(shader1, VAO3, texture);
+		//render(shader2, VAO2, -1);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -132,7 +191,7 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
 	glm::mat4 trans;
-	trans = glm::rotate(trans, glm::radians(greenValue*360), glm::vec3(0.0, 0.0, 1.0));
+	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue));
 	trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
 
 	glm::mat4 model;
@@ -140,11 +199,13 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 	glm::mat4 view;
 	// note that we’re translating the scene in the reverse direction of where we want to move
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	//view = glm::rotate(view, glm::radians(60 * timeValue), glm::vec3(0.0f, 0.0f, -3.0f));
+
 
 	glm::mat4 projection;
 	float screenWidth = 800.0;
 	float screenHeight = 600.0;
-	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
@@ -157,7 +218,30 @@ void render(const Shader &shaderProgram, unsigned VAO, int texture) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			
+			if (i % 3) {
+				glm::mat4 one;
+				shaderProgram.setMat4Uniform("transform", one);
+				shaderProgram.setMat4Uniform("model", model);
+			}
+			else {
+				shaderProgram.setMat4Uniform("transform", trans);
+				shaderProgram.setMat4Uniform("model", model);
+			}
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+//		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 	else {
 		glBindVertexArray(VAO);
@@ -174,12 +258,14 @@ unsigned getVao(unsigned vaoNo) {
 	glBindVertexArray(VAO);
 	// 2. copy our vertices array in a buffer for OpenGL to use
 
-	// same for 1 and 2
-	unsigned vertSize = vaoNo == 1 ? sizeof(vertices1) : sizeof(vertices2);
-	unsigned elementsSize = vaoNo == 1 ? sizeof(indices1) : sizeof(indices2);
+	if (vaoNo == 1 || vaoNo == 2) {
+		// same for 1 and 2
+		unsigned vertSize = vaoNo == 1 ? sizeof(vertices1) : sizeof(vertices2);
+		unsigned elementsSize = vaoNo == 1 ? sizeof(indices1) : sizeof(indices2);
 
-	unsigned VBO = verticesPrepare(vaoNo == 1 ? vertices1 : vertices2, vertSize);
-	unsigned EBO = elementsPrepare(vaoNo == 1 ? indices1 : indices2, elementsSize);
+		unsigned VBO = verticesPrepare(vaoNo == 1 ? vertices1 : vertices2, vertSize);
+		unsigned EBO = elementsPrepare(vaoNo == 1 ? indices1 : indices2, elementsSize);
+	}
 	// 3. then set our vertex attributes pointers
 	if (vaoNo == 1) {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -188,9 +274,19 @@ unsigned getVao(unsigned vaoNo) {
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
-	} else {
+	} 
+	else if (vaoNo == 2) {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+	}
+	else if (vaoNo == 3) {
+		unsigned vertSize = sizeof(verticesCube);
+		unsigned VBO = verticesPrepare(verticesCube, vertSize);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 	}
 
 	return VAO;
