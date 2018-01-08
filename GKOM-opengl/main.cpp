@@ -234,7 +234,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 
 	// rotation trans
 	glm::mat4 trans;
-	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue));
+	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue*5));
 	//trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
 
 	// model
@@ -259,8 +259,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	// light position
-	//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	glm::vec3 lightPos(camX, 0.0, camZ);
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
@@ -279,13 +278,13 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 			glm::mat4 model;
 			//model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
 			shaderProgram.set3FloatUniform("lightPos", lightPos);
 			shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
 			shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
 			shaderProgram.set3FloatUniform("viewPos", viewPosition);
-			//model = model * trans;
+			model = model * trans;
 
 			shaderProgram.setMat4Uniform("model", model);
 			
@@ -297,7 +296,6 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 		model = glm::mat4();
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
-		model = model * trans;
 		shaderProgram.setMat4Uniform("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
