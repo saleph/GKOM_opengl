@@ -21,19 +21,6 @@
 #include "Camera.h"
 #include "Shader.h"
 
-void initOpengl();
-GLFWwindow *createWindow();
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void loadLibraries();
-void processInput(GLFWwindow *window);
-void currentFpsShow(GLFWwindow* window);
-
-void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture);
-unsigned verticesPrepare(float *vertices, unsigned size);
-unsigned elementsPrepare(unsigned *indices, unsigned size);
-unsigned getVao(unsigned vaoNo);
-
-unsigned loadMinmapTexture(const char* fname);
 
 class Timer
 {
@@ -50,5 +37,24 @@ private:
 	typedef std::chrono::duration<double, std::ratio<1> > second_;
 	std::chrono::time_point<clock_> beg_;
 };
+
+class Main {
+public:
+	void mainProg();
+	void initOpengl();
+	GLFWwindow *createWindow();
+	void loadLibraries();
+
+	void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture);
+	unsigned verticesPrepare(float *vertices, unsigned size);
+	unsigned elementsPrepare(unsigned *indices, unsigned size);
+	unsigned getVao(unsigned vaoNo);
+
+	unsigned loadMinmapTexture(const char* fname);
+};
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow *window);
+void currentFpsShow(GLFWwindow* window);
 
 #endif // MAIN_H

@@ -128,7 +128,12 @@ unsigned indices2[] = {  // note that we start from 0!
 	0, 1, 2   // first triangle
 };
 
-int main()
+int main() {
+	Main mainProg;
+	mainProg.mainProg();
+}
+
+void Main::mainProg()
 {
 	initOpengl();
 	GLFWwindow* window = createWindow();
@@ -157,8 +162,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render(1, objectsShader, VAO1, texture);
 		render(2, lightSourceShader, VAO1, -1);
+		render(1, objectsShader, VAO1, texture);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -167,10 +172,9 @@ int main()
 	}
 
 	glfwTerminate();
-	return 0;
 }
 
-void initOpengl() {
+void Main::initOpengl() {
 	if (glfwInit() != GL_TRUE) {
 		std::cout << "GLFW initialization failed" << std::endl;
 		exit(-1);
@@ -183,7 +187,7 @@ void initOpengl() {
 	std::cout << ">> OpenGL initialized" << std::endl;
 }
 
-GLFWwindow *createWindow() {
+GLFWwindow *Main::createWindow() {
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Tomasz Galecki OPENGL project", NULL, NULL);
 	if (window == NULL)
 	{
@@ -204,7 +208,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void loadLibraries() {
+void Main::loadLibraries() {
 	// init glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -228,7 +232,7 @@ void currentFpsShow(GLFWwindow* window) {
 	}
 }
 
-void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture) {
+void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
@@ -302,7 +306,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	glBindVertexArray(0);
 }
 
-unsigned getVao(unsigned vaoNo) {
+unsigned Main::getVao(unsigned vaoNo) {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	// 1. bind Vertex Array Object
@@ -345,7 +349,7 @@ unsigned getVao(unsigned vaoNo) {
 	return VAO;
 }
 
-unsigned verticesPrepare(float *vertices, unsigned size) {
+unsigned Main::verticesPrepare(float *vertices, unsigned size) {
 	unsigned VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -353,7 +357,7 @@ unsigned verticesPrepare(float *vertices, unsigned size) {
 	return VBO;
 }
 
-unsigned elementsPrepare(unsigned *indices, unsigned size) {
+unsigned Main::elementsPrepare(unsigned *indices, unsigned size) {
 	unsigned EBO;
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -361,7 +365,7 @@ unsigned elementsPrepare(unsigned *indices, unsigned size) {
 	return EBO;
 }
 
-unsigned loadMinmapTexture(const char* fname) {
+unsigned Main::loadMinmapTexture(const char* fname) {
 	int width, height;
 	unsigned char* image = SOIL_load_image(fname, &width, &height, 0, SOIL_LOAD_RGB);
 	if (image == nullptr) {
