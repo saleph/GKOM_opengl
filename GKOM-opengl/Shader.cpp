@@ -87,8 +87,6 @@ void Shader::checkShaderCompilation(unsigned shader, const char *shaderType) {
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
 		glfwTerminate();
-		char x;
-		std::cin >> x;
 		exit(-1);
 	}
 }
@@ -120,8 +118,6 @@ void Shader::checkShaderProgramCompilation(unsigned shaderProgram) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::LINK_FAILED\n" << infoLog << std::endl;
 		glfwTerminate();
-		char x;
-		std::cin >> x;
 		exit(-1);
 	}
 }
@@ -152,4 +148,10 @@ void Shader::setMat4Uniform(const std::string &name, glm::mat4 &value) const {
 	use();
 	unsigned transformLoc = glGetUniformLocation(shaderProgramId, name.c_str());
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::set3FloatUnifor(const std::string &name, float val1, float val2, float val3) const {
+	use();
+	unsigned transformLoc = glGetUniformLocation(shaderProgramId, name.c_str());
+	glUniform3f(transformLoc, val1, val2, val3);
 }

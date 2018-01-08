@@ -95,12 +95,12 @@ int main()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
-	unsigned VAO2 = getVao(2);
+	unsigned VAO2 = getVao(2); // light
 	unsigned VAO1 = getVao(3); // cubes
 	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
 
-	Shader shader1("vertexShader1.vert", "fragmentShader1.frag");
-	Shader shader2("vertexShader2.vert", "fragmentShader2.frag");
+	Shader objectsShader("lighting.vert", "lighting.frag");
+	Shader lightSourceShader("vertexShader2.vert", "lightSource.frag");
 
 	std::async(std::launch::async, currentFpsShow, window);
 
@@ -114,8 +114,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render(1, shader1, VAO1, texture);
-		//render(shader2, VAO2, -1);
+		render(1, objectsShader, VAO1, texture);
+		render(2, lightSourceShader, VAO1, -1);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -195,6 +195,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 
 	glm::mat4 model;
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
 	float radius = 10.0f;
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
@@ -206,7 +207,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	glm::mat4 projection;
 	float screenWidth = 800.0;
 	float screenHeight = 600.0;
-	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
@@ -220,29 +221,30 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
 
-		for (unsigned int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 1; i++)
 		{
 			glm::mat4 model;
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			
-			if (i % 3) {
-				glm::mat4 one;
-				shaderProgram.setMat4Uniform("transform", one);
-				shaderProgram.setMat4Uniform("model", model);
-			}
-			else {
-				shaderProgram.setMat4Uniform("transform", trans);
-				shaderProgram.setMat4Uniform("model", model);
-			}
 
+			shaderProgram.use();
+			shaderProgram.set3FloatUnifor("objectColor", 1.0f, 0.5f, 0.31f);
+			shaderProgram.set3FloatUnifor("lightColor", 1.0f, 1.0f, 1.0f);
+			model = model * trans;
+			shaderProgram.setMat4Uniform("model", model);
+			
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
 	else {
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		glm::vec3 lightPos(1.2f, 1.0f, 2.0f); 
+		model = glm::mat4();
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		shaderProgram.setMat4Uniform("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
 }
@@ -271,7 +273,7 @@ unsigned getVao(unsigned vaoNo) {
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
 	} 
-	else if (vaoNo == 2) {
+	else if (vaoNo == 2) { // light
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 	}
