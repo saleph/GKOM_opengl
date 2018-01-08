@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <cmath>
 #include <limits>
+#include "Camera.h"
 #include "Shader.h"
 
 void initOpengl();

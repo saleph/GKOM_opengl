@@ -235,7 +235,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	// rotation trans
 	glm::mat4 trans;
 	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue));
-	trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
+	//trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
 
 	// model
 	glm::mat4 model;
@@ -245,8 +245,11 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	float radius = 10.0f;
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
+	//glm::vec3 viewPosition = glm::vec3(camX, 0.0, camZ);
+	glm::vec3 viewPosition = glm::vec3(0.0f, 0.0, 3.0f);
 	glm::mat4 view;
-	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3
+
+	view = glm::lookAt(viewPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3
 		(0.0, 1.0, 0.0));
 
 	// projection
@@ -256,7 +259,8 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	// light position
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::vec3 lightPos(camX, 0.0, camZ);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
@@ -273,13 +277,14 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 		for (unsigned int i = 0; i < 1; i++)
 		{
 			glm::mat4 model;
-			model = glm::translate(model, cubePositions[i]);
+			//model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
 			shaderProgram.set3FloatUniform("lightPos", lightPos);
 			shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
 			shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
+			shaderProgram.set3FloatUniform("viewPos", viewPosition);
 			//model = model * trans;
 
 			shaderProgram.setMat4Uniform("model", model);
@@ -292,6 +297,7 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 		model = glm::mat4();
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
+		model = model * trans;
 		shaderProgram.setMat4Uniform("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
