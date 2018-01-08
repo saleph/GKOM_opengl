@@ -26,7 +26,8 @@ public:
 	void setBoolUniform(const std::string &name, bool value) const;
 	void setIntUniform(const std::string &name, int value) const;
 	void setFloatUniform(const std::string &name, float value) const;
-	void set3FloatUnifor(const std::string &name, float val1, float val2, float val3) const;
+	void set3FloatUniform(const std::string &name, float val1, float val2, float val3) const;
+	void set3FloatUniform(const std::string &name, const glm::vec3 &vec) const;
 	void setMat4Uniform(const std::string &name, glm::mat4 &value) const;
 
 private:

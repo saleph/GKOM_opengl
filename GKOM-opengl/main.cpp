@@ -3,9 +3,52 @@
 std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 
-
-
+// with normals
 float verticesCube[] = {
+	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+	0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+	0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+	0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+	-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+
+	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+	0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+	0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+	0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+	-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+
+	-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+	-0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+	-0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+	-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+
+	0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+	0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+	0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+	0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+	0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+	0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+	0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+	0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+	0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+	-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+
+	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+	0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+	0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+	0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+	-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
+};
+
+float verticesCubeTexture[] = {
 	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
 	0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
 	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
@@ -100,7 +143,7 @@ int main()
 	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
 
 	Shader objectsShader("lighting.vert", "lighting.frag");
-	Shader lightSourceShader("vertexShader2.vert", "lightSource.frag");
+	Shader lightSourceShader("lightSource.vert", "lightSource.frag");
 
 	std::async(std::launch::async, currentFpsShow, window);
 
@@ -189,13 +232,16 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
+	// rotation trans
 	glm::mat4 trans;
 	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue));
 	trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
 
+	// model
 	glm::mat4 model;
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
+	// view
 	float radius = 10.0f;
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
@@ -203,11 +249,14 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3
 		(0.0, 1.0, 0.0));
 
-
+	// projection
 	glm::mat4 projection;
 	float screenWidth = 800.0;
 	float screenHeight = 600.0;
 	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+
+	// light position
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
@@ -228,18 +277,18 @@ void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture)
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
-			shaderProgram.use();
-			shaderProgram.set3FloatUnifor("objectColor", 1.0f, 0.5f, 0.31f);
-			shaderProgram.set3FloatUnifor("lightColor", 1.0f, 1.0f, 1.0f);
-			model = model * trans;
+			shaderProgram.set3FloatUniform("lightPos", lightPos);
+			shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
+			shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
+			//model = model * trans;
+
 			shaderProgram.setMat4Uniform("model", model);
 			
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
-	else {
+	else { // light
 		glBindVertexArray(VAO);
-		glm::vec3 lightPos(1.2f, 1.0f, 2.0f); 
 		model = glm::mat4();
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
@@ -274,16 +323,18 @@ unsigned getVao(unsigned vaoNo) {
 		glEnableVertexAttribArray(2);
 	} 
 	else if (vaoNo == 2) { // light
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		unsigned vertSize = sizeof(verticesCube);
+		unsigned VBO = verticesPrepare(verticesCube, vertSize);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 	}
 	else if (vaoNo == 3) {
 		unsigned vertSize = sizeof(verticesCube);
 		unsigned VBO = verticesPrepare(verticesCube, vertSize);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 	}
 

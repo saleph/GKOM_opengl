@@ -34,9 +34,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertexShader2.vert" />
     <None Include="lighting.frag" />
     <None Include="lightSource.frag" />
     <None Include="lighting.vert" />
+    <None Include="lightSource.vert" />
   </ItemGroup>
 </Project>

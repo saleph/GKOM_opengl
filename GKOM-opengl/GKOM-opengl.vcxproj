@@ -92,7 +92,7 @@
     <None Include="lightSource.frag" />
     <None Include="lighting.frag" />
     <None Include="lighting.vert" />
-    <None Include="vertexShader2.vert" />
+    <None Include="lightSource.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
