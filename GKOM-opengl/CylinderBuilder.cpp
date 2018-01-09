@@ -13,6 +13,8 @@ std::shared_ptr<Mesh> CylinderBuilder::buildWithHole() {
 
 	float deltaU = (mWrapEnd.x - mWrapBegin.x) / mSides;
 
+	float radiusesRatio = mSmallRadius / mBigRadius;
+
 	// outer side
 	for (unsigned i = 0; i <= mSides; ++i) {
 		float x = mBigRadius * std::cos(deltaAngle * i);
@@ -23,7 +25,6 @@ std::shared_ptr<Mesh> CylinderBuilder::buildWithHole() {
 		vertices.emplace_back(glm::vec3(x, y, mHeight / 2), glm::normalize(glm::vec3(x, y, 0)),
 			mWrapBegin.x + glm::vec2(i * deltaU, mWrapEnd.y));
 	}
-
 
 	indices.emplace_back(0);
 	indices.emplace_back(2);
@@ -77,8 +78,8 @@ std::shared_ptr<Mesh> CylinderBuilder::buildWithHole() {
 
 		vertices.emplace_back(glm::vec3(x * mSmallRadius, y * mSmallRadius, -mHeight / 2),
 			glm::vec3(0, 0, -1),
-			glm::vec2(lowerTextureCenter.x + (x / 2) * lowerTextureSize,
-			lowerTextureCenter.y + (-y / 2) * lowerTextureSize));
+			glm::vec2(lowerTextureCenter.x + (x / 2) * lowerTextureSize * radiusesRatio,
+			lowerTextureCenter.y + (-y / 2) * lowerTextureSize * radiusesRatio));
 	}
 
 	indices.emplace_back(bottomCapFirstIdx + 0);
@@ -109,8 +110,8 @@ std::shared_ptr<Mesh> CylinderBuilder::buildWithHole() {
 
 		vertices.emplace_back(glm::vec3(mSmallRadius * x, mSmallRadius * y, mHeight / 2),
 			glm::vec3(0, 0, 1),
-			glm::vec2(upperTextureCenter.x + (x / 2) * upperTextureSize,
-			upperTextureCenter.y + (-y / 2) * upperTextureSize));
+			glm::vec2(upperTextureCenter.x + (x / 2) * upperTextureSize * radiusesRatio,
+			upperTextureCenter.y + (-y / 2) * upperTextureSize * radiusesRatio));
 	}
 
 	indices.emplace_back(upperCapFirstIdx + 0);
@@ -118,8 +119,8 @@ std::shared_ptr<Mesh> CylinderBuilder::buildWithHole() {
 	indices.emplace_back(upperCapFirstIdx + 1);
 
 	for (unsigned i = 0; i < 2 * mSides; ++i) {
-		indices.emplace_back(upperCapFirstIdx + 2 * ((i + 2) / 2));
 		indices.emplace_back(upperCapFirstIdx + i + 3);
+		indices.emplace_back(upperCapFirstIdx + 2 * ((i + 2) / 2));
 		indices.emplace_back(upperCapFirstIdx + 2 * ((i + 1) / 2) + 1);
 	}
 
@@ -145,7 +146,6 @@ std::shared_ptr<Mesh> CylinderBuilder::buildStandard() {
 		vertices.emplace_back(glm::vec3(x, y, mHeight / 2), glm::normalize(glm::vec3(x, y, 0)),
 			mWrapBegin.x + glm::vec2(i * deltaU, mWrapEnd.y));
 	}
-
 
 	indices.emplace_back(0);
 	indices.emplace_back(2);
