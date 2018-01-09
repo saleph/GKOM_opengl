@@ -25,10 +25,15 @@ private:
 	glm::vec2 mLowerCapEnd;
 
 public:
-	CylinderBuilder() : mBigRadius(1.0f), mSmallRadius(0.5f), mHeight(1.0f), mSides(24) { };
+	CylinderBuilder() : mBigRadius(1.0f), mSmallRadius(0.1f), mHeight(1.0f), mSides(24) { };
 
 	CylinderBuilder& radius(GLfloat radius) {
 		mBigRadius = radius;
+		return *this;
+	};
+
+	CylinderBuilder& smallRadius(GLfloat radius) {
+		mSmallRadius = radius;
 		return *this;
 	};
 

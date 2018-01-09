@@ -153,7 +153,6 @@ void Main::mainProg()
 	std::async(std::launch::async, currentFpsShow, window);
 
 	// RENDER LOOP
-	auto cyl = CylinderBuilder().sides(1000).buildWithHole();
 	while (!glfwWindowShouldClose(window)) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
@@ -165,7 +164,6 @@ void Main::mainProg()
 
 		render(2, lightSourceShader, VAO1, -1);
 		render(1, objectsShader, VAO1, texture);
-		cyl->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -293,7 +291,8 @@ void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int te
 			model = model * trans;
 
 			shaderProgram.setMat4Uniform("model", model);
-			
+
+			CylinderBuilder().smallRadius(greenValue/2).sides(48).buildWithHole()->draw();
 			//glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
