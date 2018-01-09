@@ -17,7 +17,7 @@ public:
 
 private:
 	std::vector<Vertex> vertices;
-	std::vector<GLuint> indices;
+	std::vector<unsigned> indices;
 	unsigned VAO;
 	unsigned VBO;
 	unsigned EBO;

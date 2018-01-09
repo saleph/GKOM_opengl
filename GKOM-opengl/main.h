@@ -20,6 +20,7 @@
 #include <limits>
 #include "Camera.h"
 #include "Shader.h"
+#include "CylinderBuilder.h"
 
 
 class Timer

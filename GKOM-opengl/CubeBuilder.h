@@ -13,17 +13,17 @@ private:
 public:
 	CubeBuilder() : width(1), height(1), depth(1) {};
 
-	CubeBuilder& setWidth(GLfloat w) {
+	CubeBuilder& setWidth(float w) {
 		width = w;
 		return *this;
 	};
 
-	CubeBuilder& setHeight(GLfloat h) {
+	CubeBuilder& setHeight(float h) {
 		height = h;
 		return *this;
 	};
 
-	CubeBuilder& setDepth(GLfloat d) {
+	CubeBuilder& setDepth(float d) {
 		depth = d;
 		return *this;
 	}
@@ -62,9 +62,9 @@ public:
 
 	std::shared_ptr<Mesh> getMesh();
 private:
-	GLfloat width;
-	GLfloat height;
-	GLfloat depth;
+	float width;
+	float height;
+	float depth;
 
 	// map positions
 	glm::vec2 frontMapBegin;

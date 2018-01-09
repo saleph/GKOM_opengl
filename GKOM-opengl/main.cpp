@@ -153,8 +153,9 @@ void Main::mainProg()
 	std::async(std::launch::async, currentFpsShow, window);
 
 	// RENDER LOOP
+	auto cyl = CylinderBuilder().sides(1000).buildWithHole();
 	while (!glfwWindowShouldClose(window)) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 		Timer t;
 
@@ -164,6 +165,7 @@ void Main::mainProg()
 
 		render(2, lightSourceShader, VAO1, -1);
 		render(1, objectsShader, VAO1, texture);
+		cyl->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -260,7 +262,7 @@ void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int te
 	glm::mat4 projection;
 	float screenWidth = 800.0;
 	float screenHeight = 600.0;
-	projection = glm::perspective(glm::radians(30.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	// light position
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
@@ -292,7 +294,7 @@ void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int te
 
 			shaderProgram.setMat4Uniform("model", model);
 			
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			//glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
 	else { // light

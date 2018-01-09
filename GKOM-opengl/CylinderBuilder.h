@@ -10,7 +10,8 @@
 class CylinderBuilder {
 private:
 
-	GLfloat mRadius;
+	GLfloat mBigRadius;
+	GLfloat mSmallRadius;
 	GLfloat mHeight;
 	GLuint mSides;
 
@@ -24,10 +25,10 @@ private:
 	glm::vec2 mLowerCapEnd;
 
 public:
-	CylinderBuilder() : mRadius(1.0f), mHeight(1.0f), mSides(24) { };
+	CylinderBuilder() : mBigRadius(1.0f), mSmallRadius(0.5f), mHeight(1.0f), mSides(24) { };
 
 	CylinderBuilder& radius(GLfloat radius) {
-		mRadius = radius;
+		mBigRadius = radius;
 		return *this;
 	};
 
@@ -59,5 +60,6 @@ public:
 		return *this;
 	};
 
-	std::shared_ptr<Mesh> build();
+	std::shared_ptr<Mesh> buildStandard();
+	std::shared_ptr<Mesh> buildWithHole();
 };
