@@ -1,8 +1,8 @@
 #include "Model.h"
 
 
-Model::Model(std::shared_ptr<Mesh> objMesh, std::shared_ptr<Material> objMaterial) 
-	: mesh(std::move(objMesh)), material(std::move(objMaterial)), additionalTransform(glm::mat4())
+Model::Model(std::shared_ptr<Mesh> objMesh, std::shared_ptr<Texture> objTexture) 
+	: mesh(std::move(objMesh)), texture(std::move(objTexture)), additionalTransform(glm::mat4())
 { }
 
 void Model::updateTransform() {

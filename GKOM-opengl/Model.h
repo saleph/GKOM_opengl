@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Material.h"
+#include "Texture.h"
 #include "Mesh.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,10 +10,8 @@
 #include <memory>
 
 class Model {
-	friend class Renderer;
-
 public:
-	Model(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
+	Model(std::shared_ptr<Mesh> mesh, std::shared_ptr<Texture> texture);
 
 	void setAdditionalTransformation(glm::mat4 transformation) { additionalTransform = transformation; }
 	glm::mat4 getAdditionalTransformation() const { return additionalTransform; }
@@ -25,12 +23,12 @@ public:
 	void setRotation(glm::vec3 rotation);
 	glm::vec3 getRotation() const { return rotation; }
 
-	void setMaterial(std::shared_ptr<Material>& m) { material = m; }
-	std::shared_ptr<Material> getMaterial() { return material; }
+	void setTexture(std::shared_ptr<Texture>& m) { texture = m; }
+	std::shared_ptr<Texture> getTexture() { return texture; }
 
 private:
 	std::shared_ptr<Mesh> mesh;
-	std::shared_ptr<Material> material;
+	std::shared_ptr<Texture> texture;
 	glm::mat4 additionalTransform;
 	glm::mat4 modelMatrix;
 

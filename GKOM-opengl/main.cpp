@@ -129,11 +129,11 @@ unsigned indices2[] = {  // note that we start from 0!
 };
 
 int main() {
-	Main mainProg;
+	MainScene mainProg;
 	mainProg.mainProg();
 }
 
-void Main::mainProg()
+void MainScene::mainProg()
 {
 	initOpengl();
 	GLFWwindow* window = createWindow();
@@ -154,7 +154,7 @@ void Main::mainProg()
 
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 		Timer t;
 
@@ -174,7 +174,7 @@ void Main::mainProg()
 	glfwTerminate();
 }
 
-void Main::initOpengl() {
+void MainScene::initOpengl() {
 	if (glfwInit() != GL_TRUE) {
 		std::cout << "GLFW initialization failed" << std::endl;
 		exit(-1);
@@ -187,7 +187,7 @@ void Main::initOpengl() {
 	std::cout << ">> OpenGL initialized" << std::endl;
 }
 
-GLFWwindow *Main::createWindow() {
+GLFWwindow *MainScene::createWindow() {
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Tomasz Galecki OPENGL project", NULL, NULL);
 	if (window == NULL)
 	{
@@ -208,7 +208,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void Main::loadLibraries() {
+void MainScene::loadLibraries() {
 	// init glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -232,7 +232,7 @@ void currentFpsShow(GLFWwindow* window) {
 	}
 }
 
-void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture) {
+void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
@@ -288,11 +288,13 @@ void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int te
 			shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
 			shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
 			shaderProgram.set3FloatUniform("viewPos", viewPosition);
+			shaderProgram.setMat4Uniform("additionalTransformation", glm::mat4());
 			model = model * trans;
 
 			shaderProgram.setMat4Uniform("model", model);
 
 			CylinderBuilder()
+				.height(2)
 				.smallRadius(greenValue / 2)
 				.sides(48)
 				.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
@@ -314,7 +316,7 @@ void Main::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int te
 	glBindVertexArray(0);
 }
 
-unsigned Main::getVao(unsigned vaoNo) {
+unsigned MainScene::getVao(unsigned vaoNo) {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	// 1. bind Vertex Array Object
@@ -357,7 +359,7 @@ unsigned Main::getVao(unsigned vaoNo) {
 	return VAO;
 }
 
-unsigned Main::verticesPrepare(float *vertices, unsigned size) {
+unsigned MainScene::verticesPrepare(float *vertices, unsigned size) {
 	unsigned VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -365,7 +367,7 @@ unsigned Main::verticesPrepare(float *vertices, unsigned size) {
 	return VBO;
 }
 
-unsigned Main::elementsPrepare(unsigned *indices, unsigned size) {
+unsigned MainScene::elementsPrepare(unsigned *indices, unsigned size) {
 	unsigned EBO;
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -373,7 +375,7 @@ unsigned Main::elementsPrepare(unsigned *indices, unsigned size) {
 	return EBO;
 }
 
-unsigned Main::loadMinmapTexture(const char* fname) {
+unsigned MainScene::loadMinmapTexture(const char* fname) {
 	int width, height;
 	unsigned char* image = SOIL_load_image(fname, &width, &height, 0, SOIL_LOAD_RGB);
 	if (image == nullptr) {

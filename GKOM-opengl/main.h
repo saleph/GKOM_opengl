@@ -39,7 +39,7 @@ private:
 	std::chrono::time_point<clock_> beg_;
 };
 
-class Main {
+class MainScene {
 public:
 	void mainProg();
 	void initOpengl();
