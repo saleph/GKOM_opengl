@@ -21,6 +21,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "CylinderBuilder.h"
+#include "Model.h"
 
 
 class Timer
@@ -40,6 +41,7 @@ private:
 };
 
 class MainScene {
+
 public:
 	void mainProg();
 	void initOpengl();

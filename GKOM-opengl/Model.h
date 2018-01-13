@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
+#include "Shader.h"
 
 class Model {
 public:
@@ -25,6 +26,8 @@ public:
 
 	void setTexture(std::shared_ptr<Texture>& m) { texture = m; }
 	std::shared_ptr<Texture> getTexture() { return texture; }
+
+	void draw(const Shader &shader);
 
 private:
 	std::shared_ptr<Mesh> mesh;

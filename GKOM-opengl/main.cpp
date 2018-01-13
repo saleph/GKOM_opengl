@@ -293,15 +293,15 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 
 			shaderProgram.setMat4Uniform("model", model);
 
-			CylinderBuilder()
+			Model(CylinderBuilder()
 				.height(2)
 				.smallRadius(greenValue / 2)
 				.sides(48)
 				.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
 				.upperCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
 				.lowerCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
-				.buildWithHole()
-				->draw();
+				.buildWithHole(),
+				Texture::loadFromFile("Resources\\wood.jpg")).draw(shaderProgram);
 			//glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}

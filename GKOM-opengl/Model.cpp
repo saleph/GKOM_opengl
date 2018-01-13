@@ -26,3 +26,11 @@ void Model::setRotation(glm::vec3 rot) {
 	rotation = rot;
 	updateTransform();
 }
+
+void Model::draw(const Shader &shaderProgram) {
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture->getID());
+	shaderProgram.setMat4Uniform("model", modelMatrix);
+	shaderProgram.setMat4Uniform("additionalTransformation", additionalTransform);
+	mesh->draw();
+}
