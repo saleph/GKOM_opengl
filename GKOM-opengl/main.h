@@ -42,19 +42,16 @@ private:
 
 class MainScene {
 	std::vector<Model> sceneModels;
+	std::shared_ptr<Model> light;
 public:
+	MainScene() = default;
 	void setupScene();
 	void mainProg();
 	void initOpengl();
 	GLFWwindow *createWindow();
 	void loadLibraries();
 
-	void render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture);
-	unsigned verticesPrepare(float *vertices, unsigned size);
-	unsigned elementsPrepare(unsigned *indices, unsigned size);
-	unsigned getVao(unsigned vaoNo);
-
-	unsigned loadMinmapTexture(const char* fname);
+	void updateShader(const Shader &shaderProgram);
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

@@ -4,6 +4,7 @@
 std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 int SPIN_DIRECTION = 1;
+float CAMERA_Z = 5.0f;
 
 void MainScene::setupScene() {
 	const float ROTATION_SPEED = 300.0f;
@@ -47,6 +48,14 @@ void MainScene::setupScene() {
 	auto woodTexture = Texture::loadFromFile("Resources\\wood.jpg");
 	auto brushedTexture = Texture::loadFromFile("Resources\\brushed.jpg");
 
+	glm::vec3 lightPos(7.0, -7.0, 7.0);
+	light = std::make_shared<Model>(Model(CubeBuilder()
+		.setDepth(0.2)
+		.setHeight(0.2)
+		.setWidth(0.2)
+		.getMesh(),
+		brushedTexture)
+		.setPosition(lightPos));
 	
 	// cylinder
 	sceneModels.push_back(Model(CylinderBuilder()
@@ -121,7 +130,7 @@ void MainScene::setupScene() {
 		.getMesh(),
 		woodTexture
 		)
-		.setPosition(glm::vec3(-BASE_LENGTH/3.9, 0.0f, TOWER_HEIGHT + (BASE_WIDTH / 4) / 2))
+		.setPosition(glm::vec3(-BASE_LENGTH/3.9, 0.0f, TOWER_HEIGHT + (BASE_WIDTH / 4) / 3.2))
 		);
 
 
@@ -203,130 +212,6 @@ void MainScene::setupScene() {
 		);
 }
 
-// with normals
-float verticesCube[] = {
-	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-	0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-	0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-	0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-	-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-
-	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-	0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-	0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-	0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-	-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-
-	-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-	-0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-	-0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-	-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-	0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-	0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-	0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-	0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-	0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-	0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-	0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-	-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-
-	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-	0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-	0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-	0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-	-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
-};
-
-float verticesCubeTexture[] = {
-	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-	0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-	0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-	0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-	0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-	-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-
-	-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-	-0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-	-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-	0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-	0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-	0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-	0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-	0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-	0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-	-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-
-	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-	0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-	-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-	-0.5f, 0.5f, -0.5f, 0.0f, 1.0f
-};
-
-glm::vec3 cubePositions[] = {
-	glm::vec3(0.0f, 0.0f, 0.0f),
-	glm::vec3(2.0f, 5.0f, -15.0f),
-	glm::vec3(-1.5f, -2.2f, -2.5f),
-	glm::vec3(-3.8f, -2.0f, -12.3f),
-	glm::vec3(2.4f, -0.4f, -3.5f),
-	glm::vec3(-1.7f, 3.0f, -7.5f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(1.5f, 2.0f, -2.5f),
-	glm::vec3(1.5f, 0.2f, -1.5f),
-	glm::vec3(-1.3f, 1.0f, -1.5f)
-};
-
-float vertices1[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-};
-
-unsigned indices1[] = {  // note that we start from 0!
-	0, 1, 3,   // first triangle
-	1, 2, 3    // second triangle
-};
-
-float vertices2[] = {
-	0.0f, 0.3f, 0.0f,  // top  
-	-0.3f, 0.0f, 0.0f,  // bottom left
-	0.3f, 0.0f, 0.0f  // bottom right 
-};
-
-unsigned indices2[] = {  // note that we start from 0!
-	0, 1, 2   // first triangle
-};
 
 int main() {
 	MainScene mainProg;
@@ -339,14 +224,6 @@ void MainScene::mainProg()
 	GLFWwindow* window = createWindow();
 	loadLibraries();
 
-	// line/fill setting
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_DEPTH_TEST);
-	unsigned VAO2 = getVao(2); // light
-	unsigned VAO1 = getVao(3); // cubes
-	unsigned texture = loadMinmapTexture("Resources\\wood.jpg");
-
 	Shader objectsShader("lighting.vert", "lighting.frag");
 	Shader lightSourceShader("lightSource.vert", "lightSource.frag");
 
@@ -355,15 +232,19 @@ void MainScene::mainProg()
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
 		Timer t;
 
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render(2, lightSourceShader, VAO1, -1);
-		render(1, objectsShader, VAO1, texture);
+		// draw objects
+		updateShader(objectsShader);
+		for (auto &&model : sceneModels) {
+			model.draw(objectsShader, SPIN_DIRECTION);
+		}
+		// draw light
+		light->draw(lightSourceShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -416,6 +297,8 @@ void MainScene::loadLibraries() {
 		exit(-1);
 	}
 	std::cout << ">> GLAD initialized" << std::endl;
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void processInput(GLFWwindow *window) {
@@ -425,6 +308,12 @@ void processInput(GLFWwindow *window) {
 		SPIN_DIRECTION = 1;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		SPIN_DIRECTION = -1;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		CAMERA_Z += 0.4f;
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		CAMERA_Z -= 0.4f;
+
+	if (CAMERA_Z <= 0.1f) CAMERA_Z = 0.1f;
 }
 
 void currentFpsShow(GLFWwindow* window) {
@@ -436,13 +325,13 @@ void currentFpsShow(GLFWwindow* window) {
 	}
 }
 
-void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, int texture) {
+void MainScene::updateShader(const Shader &shaderProgram) {
 	float timeValue = glfwGetTime();
 	float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 
 	// rotation trans
 	glm::mat4 trans;
-	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue*5));
+	trans = glm::rotate(trans, glm::radians(greenValue * 360), glm::vec3(greenValue*greenValue, greenValue * 2, greenValue * 5));
 	//trans = glm::scale(trans, glm::vec3(0.8, 0.8, 0.5));
 
 	// model
@@ -454,7 +343,7 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
 	//glm::vec3 viewPosition = glm::vec3(camX, 0.0, camZ);
-	glm::vec3 viewPosition = glm::vec3(camX, camZ, 10.0f);
+	glm::vec3 viewPosition = glm::vec3(camX, camZ, CAMERA_Z);
 	glm::mat4 view;
 
 	view = glm::lookAt(viewPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3
@@ -478,107 +367,4 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 	shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
 	shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
 	shaderProgram.set3FloatUniform("viewPos", viewPosition);
-	shaderProgram.use();
-
-	if (vaoType == 1) {
-		for (unsigned int i = 0; i < 1; i++)
-		{
-			for (auto &&model : sceneModels) {
-				model.draw(shaderProgram, SPIN_DIRECTION);
-			}
-			
-		}
-	}
-	else { // light
-		glBindVertexArray(VAO);
-		model = glm::mat4();
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		shaderProgram.setMat4Uniform("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-	glBindVertexArray(0);
-}
-
-unsigned MainScene::getVao(unsigned vaoNo) {
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO);
-	// 2. copy our vertices array in a buffer for OpenGL to use
-
-	if (vaoNo == 1 || vaoNo == 2) {
-		// same for 1 and 2
-		unsigned vertSize = vaoNo == 1 ? sizeof(vertices1) : sizeof(vertices2);
-		unsigned elementsSize = vaoNo == 1 ? sizeof(indices1) : sizeof(indices2);
-
-		unsigned VBO = verticesPrepare(vaoNo == 1 ? vertices1 : vertices2, vertSize);
-		unsigned EBO = elementsPrepare(vaoNo == 1 ? indices1 : indices2, elementsSize);
-	}
-	// 3. then set our vertex attributes pointers
-	if (vaoNo == 1) {
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-	} 
-	else if (vaoNo == 2) { // light
-		unsigned vertSize = sizeof(verticesCube);
-		unsigned VBO = verticesPrepare(verticesCube, vertSize);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-	}
-	else if (vaoNo == 3) {
-		unsigned vertSize = sizeof(verticesCube);
-		unsigned VBO = verticesPrepare(verticesCube, vertSize);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-	}
-
-	return VAO;
-}
-
-unsigned MainScene::verticesPrepare(float *vertices, unsigned size) {
-	unsigned VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-	return VBO;
-}
-
-unsigned MainScene::elementsPrepare(unsigned *indices, unsigned size) {
-	unsigned EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
-	return EBO;
-}
-
-unsigned MainScene::loadMinmapTexture(const char* fname) {
-	int width, height;
-	unsigned char* image = SOIL_load_image(fname, &width, &height, 0, SOIL_LOAD_RGB);
-	if (image == nullptr) {
-		std::cout << "ERROR::TEXTURE::CAN'T_LOAD: " << fname << std::endl;
-		exit(-1);
-	}
-
-	unsigned texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(image);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	return texture;
 }
