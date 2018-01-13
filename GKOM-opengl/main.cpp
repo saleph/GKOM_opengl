@@ -5,6 +5,7 @@ std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 
 void MainScene::setupScene() {
+	const float ROTATION_SPEED = 300.0f;
 	const float PI = 3.1415f;
 	const float CYLINDER_HEIGHT = 1.0f;
 	const float TOWER_HEIGHT = 5.0f;
@@ -16,17 +17,17 @@ void MainScene::setupScene() {
 	const float CUBES_HEIGHT = CYLINDER_HEIGHT;
 	const float BASE_WIDTH = CYLINDER_RADIUS * 3;
 
-	auto cylinderSpinner = [](int multipler) {
+	auto cylinderSpinner = [ROTATION_SPEED](int multipler) {
 		float timeValue = glfwGetTime();
 		float normalizedTimeValue = sin(timeValue);
 
 		// rotation trans
 		glm::mat4 trans;
-		trans = glm::rotate(trans, glm::radians(multipler * timeValue * 200), glm::vec3(0.0f, 0.0f, 1.0f));
+		trans = glm::rotate(trans, glm::radians(multipler * timeValue * ROTATION_SPEED), glm::vec3(0.0f, 0.0f, 1.0f));
 		return trans;
 	};
 
-	auto stickSpinner = [PI, STICK_LEN, STICK_ANGLE, CYLINDER_HEIGHT](int multipler) {
+	auto stickSpinner = [PI, STICK_LEN, STICK_ANGLE, CYLINDER_HEIGHT, ROTATION_SPEED](int multipler) {
 		float timeValue = glfwGetTime();
 		float normalizedTimeValue = sin(timeValue);
 
@@ -34,7 +35,7 @@ void MainScene::setupScene() {
 		glm::mat4 trans;
 		float move = STICK_LEN;
 		//trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, move));
-		trans = glm::rotate(trans, glm::radians(multipler * timeValue * 200), glm::vec3(0.0, 0.0, 1.0));
+		trans = glm::rotate(trans, glm::radians(multipler * timeValue * ROTATION_SPEED), glm::vec3(0.0, 0.0, 1.0));
 		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, STICK_LEN/2));
 		trans = glm::rotate(trans, STICK_ANGLE, glm::vec3(1.0, 0.0, 0.0));
 		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, -STICK_LEN/2));
@@ -43,6 +44,7 @@ void MainScene::setupScene() {
 	};
 
 	auto woodTexture = Texture::loadFromFile("Resources\\wood.jpg");
+	auto brushedTexture = Texture::loadFromFile("Resources\\brushed.jpg");
 
 	
 	// cylinder
@@ -118,9 +120,86 @@ void MainScene::setupScene() {
 		.getMesh(),
 		woodTexture
 		)
-		.setPosition(glm::vec3(-BASE_LENGTH/4, 0.0f, TOWER_HEIGHT + (BASE_WIDTH / 4) / 2))
+		.setPosition(glm::vec3(-BASE_LENGTH/3.9, 0.0f, TOWER_HEIGHT + (BASE_WIDTH / 4) / 2))
 		);
 
+
+	const float BOX_SIZE = 40.0f;
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(1)
+		.setHeight(BOX_SIZE)
+		.setWidth(BOX_SIZE)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		brushedTexture
+		)
+		.setPosition(glm::vec3(0.0f, 0.0f, -(CUBES_HEIGHT+0.5f)))
+		);
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(BOX_SIZE)
+		.setHeight(1)
+		.setWidth(BOX_SIZE)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		brushedTexture
+		)
+		.setPosition(glm::vec3(0, BOX_SIZE/2.1, BOX_SIZE/2.3))
+		);
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(BOX_SIZE)
+		.setHeight(1)
+		.setWidth(BOX_SIZE)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		brushedTexture
+		)
+		.setPosition(glm::vec3(0, -BOX_SIZE / 2.1, BOX_SIZE / 2.3))
+		);
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(BOX_SIZE)
+		.setHeight(BOX_SIZE)
+		.setWidth(1)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		brushedTexture
+		)
+		.setPosition(glm::vec3(-BOX_SIZE / 2.1, 0, BOX_SIZE / 2.3))
+		);
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(BOX_SIZE)
+		.setHeight(BOX_SIZE)
+		.setWidth(1)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		brushedTexture
+		)
+		.setPosition(glm::vec3(BOX_SIZE / 2.1, 0, BOX_SIZE / 2.3))
+		);
 }
 
 // with normals
@@ -366,11 +445,11 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	// view
-	float radius = 10.0f;
+	float radius = 17.0f;
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
 	//glm::vec3 viewPosition = glm::vec3(camX, 0.0, camZ);
-	glm::vec3 viewPosition = glm::vec3(10.0f, 10.0, 10.0f);
+	glm::vec3 viewPosition = glm::vec3(camX, camZ, 10.0f);
 	glm::mat4 view;
 
 	view = glm::lookAt(viewPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3
