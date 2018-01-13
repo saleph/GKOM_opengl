@@ -4,15 +4,68 @@ std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 
 void MainScene::setupScene() {
+	const float PI = 3.1415f;
+	const float CYLINDER_HEIGHT = 1.0f;
+	const float TOWER_HEIGHT = 4.0f;
+	const float STICK_ANGLE = PI * 1.0f / 6.0f;
+	const float STICK_LEN = (TOWER_HEIGHT - CYLINDER_HEIGHT) / cos(STICK_ANGLE);
+
+	auto cylinderSpinner = [](int multipler) {
+		float timeValue = glfwGetTime();
+		float normalizedTimeValue = sin(timeValue);
+
+		// rotation trans
+		glm::mat4 trans;
+		trans = glm::rotate(trans, glm::radians(multipler * timeValue * 200), glm::vec3(0.0f, 0.0f, 1.0f));
+		return trans;
+	};
+
+	auto stickSpinner = [PI, STICK_LEN, STICK_ANGLE, CYLINDER_HEIGHT](int multipler) {
+		float timeValue = glfwGetTime();
+		float normalizedTimeValue = sin(timeValue);
+
+		// rotation trans
+		glm::mat4 trans;
+		float move = STICK_LEN;
+		//trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, move));
+		trans = glm::rotate(trans, glm::radians(multipler * timeValue * 200), glm::vec3(0.0, 0.0, 1.0));
+		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, STICK_LEN));
+		trans = glm::rotate(trans, STICK_ANGLE, glm::vec3(1.0, 0.0, 0.0));
+		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, -STICK_LEN/2));
+		return trans;
+
+	};
+
+	auto woodTexture = Texture::loadFromFile("Resources\\wood.jpg");
+
+	// cylinder
 	sceneModels.push_back(Model(CylinderBuilder()
-		.height(2)
-		.smallRadius(0.3)
+		.height(CYLINDER_HEIGHT)
+		.radius(CYLINDER_HEIGHT*2)
+		.smallRadius(0.2f)
 		.sides(48)
 		.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
 		.upperCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
 		.lowerCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
 		.buildWithHole(),
-		Texture::loadFromFile("Resources\\wood.jpg")));
+		woodTexture,
+		cylinderSpinner)
+		//.setPosition(glm::vec3(0.0f, CYLINDER_HEIGHT/2, 0.0f))
+		);
+	// stick
+	sceneModels.push_back(Model(CylinderBuilder()
+		.height(STICK_LEN)
+		.radius(0.1f)
+		.sides(48)
+		.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
+		.upperCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
+		.lowerCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
+		.buildStandard(),
+		woodTexture,
+		stickSpinner)
+		//.setRotation(glm::vec3(PI / 2.0f, 0.0f, 0.0f))
+		//.setPosition(glm::vec3(0.0, 0.0, 0.0))
+		);
 }
 
 // with normals
@@ -166,7 +219,7 @@ void MainScene::mainProg()
 	setupScene();
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) {
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 		Timer t;
 
@@ -262,11 +315,11 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 	float camX = sin(glfwGetTime()) * radius;
 	float camZ = cos(glfwGetTime()) * radius;
 	//glm::vec3 viewPosition = glm::vec3(camX, 0.0, camZ);
-	glm::vec3 viewPosition = glm::vec3(0.0f, 0.0, 3.0f);
+	glm::vec3 viewPosition = glm::vec3(10.0f, 10.0, 10.0f);
 	glm::mat4 view;
 
 	view = glm::lookAt(viewPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3
-		(0.0, 1.0, 0.0));
+		(0.0, 0.0, 1.0));
 
 	// projection
 	glm::mat4 projection;
@@ -275,41 +328,26 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 	projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 	// light position
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::vec3 lightPos(7.0, -7.0, 7.0);
 
 	shaderProgram.setMat4Uniform("model", model);
 	shaderProgram.setMat4Uniform("view", view);
 	shaderProgram.setMat4Uniform("projection", projection);
 	shaderProgram.setMat4Uniform("transform", trans);
 	shaderProgram.setFloatUniform("uniColor", greenValue);
+	shaderProgram.set3FloatUniform("lightPos", lightPos);
+	shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
+	shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
+	shaderProgram.set3FloatUniform("viewPos", viewPosition);
 	shaderProgram.use();
 
 	if (vaoType == 1) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glBindVertexArray(VAO);
-
 		for (unsigned int i = 0; i < 1; i++)
 		{
-			glm::mat4 model;
-			//model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
-			shaderProgram.set3FloatUniform("lightPos", lightPos);
-			shaderProgram.set3FloatUniform("objectColor", 1.0f, 0.5f, 0.31f);
-			shaderProgram.set3FloatUniform("lightColor", 1.0f, 1.0f, 1.0f);
-			shaderProgram.set3FloatUniform("viewPos", viewPosition);
-			shaderProgram.setMat4Uniform("additionalTransformation", glm::mat4());
-			model = model * trans;
-
-			shaderProgram.setMat4Uniform("model", model);
-
 			for (auto &&model : sceneModels) {
 				model.draw(shaderProgram);
 			}
 			
-			//glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
 	else { // light

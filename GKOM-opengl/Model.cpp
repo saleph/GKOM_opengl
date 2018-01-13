@@ -1,8 +1,8 @@
 #include "Model.h"
 
 
-Model::Model(std::shared_ptr<Mesh> objMesh, std::shared_ptr<Texture> objTexture) 
-	: mesh(std::move(objMesh)), texture(std::move(objTexture)), additionalTransform(glm::mat4())
+Model::Model(std::shared_ptr<Mesh> objMesh, std::shared_ptr<Texture> objTexture, std::function<glm::mat4(int)> transform)
+	: mesh(std::move(objMesh)), texture(std::move(objTexture)), transformGenerator(transform)
 { }
 
 void Model::updateTransform() {
@@ -13,24 +13,26 @@ void Model::updateTransform() {
 	modelMatrix = glm::rotate(rotate, rotation.z, glm::vec3(0, 0, 1));
 }
 
-void Model::setPosition(glm::vec3 pos) {
+Model& Model::setPosition(glm::vec3 pos) {
 	if (position == pos)
-		return;
+		return *this;
 	position = pos;
 	updateTransform();
+	return *this;
 }
 
-void Model::setRotation(glm::vec3 rot) {
+Model& Model::setRotation(glm::vec3 rot) {
 	if (rotation == rot)
-		return;
+		return *this;
 	rotation = rot;
 	updateTransform();
+	return *this;
 }
 
-void Model::draw(const Shader &shaderProgram) {
+void Model::draw(const Shader &shaderProgram, int transformGenArg) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture->getID());
 	shaderProgram.setMat4Uniform("model", modelMatrix);
-	shaderProgram.setMat4Uniform("additionalTransformation", additionalTransform);
+	shaderProgram.setMat4Uniform("additionalTransformation", transformGenerator(transformGenArg));
 	mesh->draw();
 }

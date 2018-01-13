@@ -19,7 +19,7 @@ void main() {
 	vec3 lightDir = normalize(lightPos - FragPos);  
 	
 	// ambient component
-	float ambientStrength = 0.1;
+	float ambientStrength = 0.3;
     vec3 ambient = ambientStrength * lightColor;
 
 	// diffuse component
