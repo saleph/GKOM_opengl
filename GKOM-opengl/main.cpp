@@ -3,6 +3,7 @@
 
 std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
+int SPIN_DIRECTION = 1;
 
 void MainScene::setupScene() {
 	const float ROTATION_SPEED = 300.0f;
@@ -420,6 +421,10 @@ void MainScene::loadLibraries() {
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+		SPIN_DIRECTION = 1;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		SPIN_DIRECTION = -1;
 }
 
 void currentFpsShow(GLFWwindow* window) {
@@ -479,7 +484,7 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 		for (unsigned int i = 0; i < 1; i++)
 		{
 			for (auto &&model : sceneModels) {
-				model.draw(shaderProgram);
+				model.draw(shaderProgram, SPIN_DIRECTION);
 			}
 			
 		}
