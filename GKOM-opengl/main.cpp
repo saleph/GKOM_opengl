@@ -72,7 +72,7 @@ void MainScene::setupScene() {
 		stickSpinner)
 		.setPosition(glm::vec3(0.0, 0.0, CYLINDER_HEIGHT/2 + (TOWER_HEIGHT-CYLINDER_HEIGHT)/2))
 		);
-	
+	// base
 	sceneModels.push_back(Model(CubeBuilder()
 		.setDepth(CUBES_HEIGHT)
 		.setHeight(BASE_WIDTH)
@@ -86,8 +86,41 @@ void MainScene::setupScene() {
 		.getMesh(),
 		woodTexture
 		)
-		.setPosition(glm::vec3(-BASE_LENGTH/4, 0.0f, -CUBES_HEIGHT / 2)));
-		
+		.setPosition(glm::vec3(-BASE_LENGTH/4, 0.0f, -CUBES_HEIGHT / 2))
+		);
+	// tower
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(TOWER_HEIGHT)
+		.setHeight(BASE_WIDTH/4)
+		.setWidth(BASE_WIDTH / 4)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		woodTexture
+		)
+		.setPosition(glm::vec3(-BASE_LENGTH / 1.7, 0.0f, TOWER_HEIGHT / 2))
+		);
+	// horizontal arm
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(BASE_WIDTH / 4)
+		.setHeight(BASE_WIDTH / 4)
+		.setWidth(BASE_LENGTH/1.3)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		woodTexture
+		)
+		.setPosition(glm::vec3(-BASE_LENGTH/4, 0.0f, TOWER_HEIGHT + (BASE_WIDTH / 4) / 2))
+		);
+
 }
 
 // with normals
