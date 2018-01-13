@@ -41,8 +41,9 @@ private:
 };
 
 class MainScene {
-
+	std::vector<Model> sceneModels;
 public:
+	void setupScene();
 	void mainProg();
 	void initOpengl();
 	GLFWwindow *createWindow();

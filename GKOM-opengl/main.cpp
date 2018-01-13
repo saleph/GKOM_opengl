@@ -3,6 +3,18 @@
 std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
 
+void MainScene::setupScene() {
+	sceneModels.push_back(Model(CylinderBuilder()
+		.height(2)
+		.smallRadius(0.3)
+		.sides(48)
+		.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
+		.upperCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
+		.lowerCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
+		.buildWithHole(),
+		Texture::loadFromFile("Resources\\wood.jpg")));
+}
+
 // with normals
 float verticesCube[] = {
 	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
@@ -151,7 +163,7 @@ void MainScene::mainProg()
 	Shader lightSourceShader("lightSource.vert", "lightSource.frag");
 
 	std::async(std::launch::async, currentFpsShow, window);
-
+	setupScene();
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) {
 		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -293,15 +305,10 @@ void MainScene::render(int vaoType, const Shader &shaderProgram, unsigned VAO, i
 
 			shaderProgram.setMat4Uniform("model", model);
 
-			Model(CylinderBuilder()
-				.height(2)
-				.smallRadius(greenValue / 2)
-				.sides(48)
-				.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
-				.upperCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
-				.lowerCap(glm::vec2(0.0, 0.5), glm::vec2(0.5, 1.0))
-				.buildWithHole(),
-				Texture::loadFromFile("Resources\\wood.jpg")).draw(shaderProgram);
+			for (auto &&model : sceneModels) {
+				model.draw(shaderProgram);
+			}
+			
 			//glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
