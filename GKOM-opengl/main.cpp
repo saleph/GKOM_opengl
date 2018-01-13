@@ -1,4 +1,5 @@
 #include "main.h"
+#include "CubeBuilder.h"
 
 std::atomic<unsigned long> fps;
 std::atomic<double> frameTimes;
@@ -6,10 +7,14 @@ std::atomic<double> frameTimes;
 void MainScene::setupScene() {
 	const float PI = 3.1415f;
 	const float CYLINDER_HEIGHT = 1.0f;
+	const float TOWER_HEIGHT = 5.0f;
 	const float CYLINDER_RADIUS = 2 * CYLINDER_HEIGHT;
-	const float TOWER_HEIGHT = 7.0f;
 	const float STICK_ANGLE = atan(CYLINDER_RADIUS / (TOWER_HEIGHT - CYLINDER_HEIGHT));
 	const float STICK_LEN = (TOWER_HEIGHT - CYLINDER_HEIGHT) / cos(STICK_ANGLE);
+
+	const float BASE_LENGTH = CYLINDER_RADIUS * 7;
+	const float CUBES_HEIGHT = CYLINDER_HEIGHT;
+	const float BASE_WIDTH = CYLINDER_RADIUS * 3;
 
 	auto cylinderSpinner = [](int multipler) {
 		float timeValue = glfwGetTime();
@@ -39,10 +44,11 @@ void MainScene::setupScene() {
 
 	auto woodTexture = Texture::loadFromFile("Resources\\wood.jpg");
 
+	
 	// cylinder
 	sceneModels.push_back(Model(CylinderBuilder()
 		.height(CYLINDER_HEIGHT)
-		.radius(CYLINDER_RADIUS)
+		.radius(CYLINDER_RADIUS + 0.3f)
 		.smallRadius(0.2f)
 		.sides(48)
 		.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
@@ -64,9 +70,24 @@ void MainScene::setupScene() {
 		.buildStandard(),
 		woodTexture,
 		stickSpinner)
-		//.setRotation(glm::vec3(PI / 2.0f, 0.0f, 0.0f))
 		.setPosition(glm::vec3(0.0, 0.0, CYLINDER_HEIGHT/2 + (TOWER_HEIGHT-CYLINDER_HEIGHT)/2))
 		);
+	
+	sceneModels.push_back(Model(CubeBuilder()
+		.setDepth(CUBES_HEIGHT)
+		.setHeight(BASE_WIDTH)
+		.setWidth(BASE_LENGTH)
+		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.leftMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.rightMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.frontMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.backMap(glm::vec2(0, 0), glm::vec2(1, 1))
+		.getMesh(),
+		woodTexture
+		)
+		.setPosition(glm::vec3(-BASE_LENGTH/4, 0.0f, -CUBES_HEIGHT / 2)));
+		
 }
 
 // with normals
