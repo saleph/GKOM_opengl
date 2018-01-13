@@ -6,8 +6,9 @@ std::atomic<double> frameTimes;
 void MainScene::setupScene() {
 	const float PI = 3.1415f;
 	const float CYLINDER_HEIGHT = 1.0f;
-	const float TOWER_HEIGHT = 4.0f;
-	const float STICK_ANGLE = PI * 1.0f / 6.0f;
+	const float CYLINDER_RADIUS = 2 * CYLINDER_HEIGHT;
+	const float TOWER_HEIGHT = 7.0f;
+	const float STICK_ANGLE = atan(CYLINDER_RADIUS / (TOWER_HEIGHT - CYLINDER_HEIGHT));
 	const float STICK_LEN = (TOWER_HEIGHT - CYLINDER_HEIGHT) / cos(STICK_ANGLE);
 
 	auto cylinderSpinner = [](int multipler) {
@@ -29,7 +30,7 @@ void MainScene::setupScene() {
 		float move = STICK_LEN;
 		//trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, move));
 		trans = glm::rotate(trans, glm::radians(multipler * timeValue * 200), glm::vec3(0.0, 0.0, 1.0));
-		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, STICK_LEN));
+		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, STICK_LEN/2));
 		trans = glm::rotate(trans, STICK_ANGLE, glm::vec3(1.0, 0.0, 0.0));
 		trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, -STICK_LEN/2));
 		return trans;
@@ -41,7 +42,7 @@ void MainScene::setupScene() {
 	// cylinder
 	sceneModels.push_back(Model(CylinderBuilder()
 		.height(CYLINDER_HEIGHT)
-		.radius(CYLINDER_HEIGHT*2)
+		.radius(CYLINDER_RADIUS)
 		.smallRadius(0.2f)
 		.sides(48)
 		.wrap(glm::vec2(0.0, 0), glm::vec2(1, 1))
@@ -50,7 +51,7 @@ void MainScene::setupScene() {
 		.buildWithHole(),
 		woodTexture,
 		cylinderSpinner)
-		//.setPosition(glm::vec3(0.0f, CYLINDER_HEIGHT/2, 0.0f))
+		.setPosition(glm::vec3(0.0f, 0.0f, CYLINDER_HEIGHT / 2))
 		);
 	// stick
 	sceneModels.push_back(Model(CylinderBuilder()
@@ -64,7 +65,7 @@ void MainScene::setupScene() {
 		woodTexture,
 		stickSpinner)
 		//.setRotation(glm::vec3(PI / 2.0f, 0.0f, 0.0f))
-		//.setPosition(glm::vec3(0.0, 0.0, 0.0))
+		.setPosition(glm::vec3(0.0, 0.0, CYLINDER_HEIGHT/2 + (TOWER_HEIGHT-CYLINDER_HEIGHT)/2))
 		);
 }
 
