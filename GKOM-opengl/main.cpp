@@ -118,8 +118,8 @@ void MainScene::setupScene() {
 		);
 	// horizontal arm
 	sceneModels.push_back(Model(CubeBuilder()
-		.setDepth(BASE_WIDTH / 4)
-		.setHeight(BASE_WIDTH / 4)
+		.setDepth(BASE_WIDTH / 4 + 0.05)
+		.setHeight(BASE_WIDTH / 4 + 0.05)
 		.setWidth(BASE_LENGTH/1.3)
 		.topMap(glm::vec2(0, 0), glm::vec2(1, 1))
 		.bottomMap(glm::vec2(0, 0), glm::vec2(1, 1))
